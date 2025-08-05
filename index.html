@@ -46,16 +46,37 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer; /* Adicionado para indicar que o item é clicável */
+            transition: background-color 0.2s;
+        }
+
+        #lista-tarefas li:hover {
+            background-color: #dee2e6;
+        }
+
+        /* Estilo para a tarefa concluída */
+        #lista-tarefas li.done {
+            text-decoration: line-through;
+            color: #888;
+            background-color: #d1d8df;
         }
 
         #lista-tarefas li .horario {
             font-weight: bold;
             color: #555;
+            flex-shrink: 0;
+            margin-right: 1rem;
+        }
+        
+        #lista-tarefas li.done .horario,
+        #lista-tarefas li.done .tarefa {
+            color: #888;
         }
 
         #lista-tarefas li .tarefa {
             flex-grow: 1;
-            margin-left: 1rem;
+            margin-right: 1rem;
+            outline: none; /* Remove o contorno azul ao editar */
         }
     </style>
 </head>
@@ -68,7 +89,7 @@
 
     <script>
         // O planejamento semanal atualizado com o novo cronograma.
-        const planejamentoSemanal = {
+        const planejamentoBase = {
             "Segunda-feira": [
                 { horario: "7h - 7h30", tarefa: "Afazeres simples (varrer, louça, cama)" },
                 { horario: "7h30 - 10h", tarefa: "Estudar" },
@@ -127,22 +148,51 @@
             "Sexta-feira",
             "Sábado"
         ];
+        
+        let planejamentoAtual = JSON.parse(localStorage.getItem('planejamentoSemanal')) || planejamentoBase;
 
         function mostrarPlanejamentoDoDia() {
             const dataAtual = new Date();
             const numeroDoDia = dataAtual.getDay();
             const nomeDoDia = diasDaSemana[numeroDoDia];
-            const tarefasDoDia = planejamentoSemanal[nomeDoDia];
+            const tarefasDoDia = planejamentoAtual[nomeDoDia];
 
             document.getElementById("dia-da-semana").innerText = `Planejamento para ${nomeDoDia}`;
             const listaTarefas = document.getElementById("lista-tarefas");
             listaTarefas.innerHTML = "";
 
             if (tarefasDoDia) {
-                tarefasDoDia.forEach(item => {
+                tarefasDoDia.forEach((item, index) => {
                     const li = document.createElement("li");
-                    li.innerHTML = `<span class="horario">${item.horario}</span><span class="tarefa">${item.tarefa}</span>`;
+                    const idDaTarefa = `${nomeDoDia}-${index}`;
+                    li.dataset.id = idDaTarefa;
+
+                    const horarioSpan = document.createElement("span");
+                    horarioSpan.className = "horario";
+                    horarioSpan.textContent = item.horario;
+                    horarioSpan.contentEditable = "true";
+
+                    const tarefaSpan = document.createElement("span");
+                    tarefaSpan.className = "tarefa";
+                    tarefaSpan.textContent = item.tarefa;
+                    tarefaSpan.contentEditable = "true";
+
+                    li.appendChild(horarioSpan);
+                    li.appendChild(tarefaSpan);
+
+                    if (item.done) {
+                        li.classList.add("done");
+                    }
+
                     listaTarefas.appendChild(li);
+
+                    // Salva alterações ao sair do campo
+                    horarioSpan.addEventListener('blur', () => {
+                        salvarEdicao(idDaTarefa, 'horario', horarioSpan.textContent);
+                    });
+                    tarefaSpan.addEventListener('blur', () => {
+                        salvarEdicao(idDaTarefa, 'tarefa', tarefaSpan.textContent);
+                    });
                 });
             } else {
                 const li = document.createElement("li");
@@ -151,8 +201,30 @@
             }
         }
 
+        function salvarEdicao(id, campo, valor) {
+            const [nomeDoDia, index] = id.split('-');
+            if (planejamentoAtual[nomeDoDia] && planejamentoAtual[nomeDoDia][index]) {
+                planejamentoAtual[nomeDoDia][index][campo] = valor;
+                localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
+            }
+        }
+
+        // Adiciona um evento de clique para marcar a tarefa como concluída
+        document.getElementById("lista-tarefas").addEventListener("click", function(event) {
+            const li = event.target.closest("li");
+            if (li) {
+                const idDaTarefa = li.dataset.id;
+                li.classList.toggle("done");
+                
+                const [nomeDoDia, index] = idDaTarefa.split('-');
+                if (planejamentoAtual[nomeDoDia] && planejamentoAtual[nomeDoDia][index]) {
+                    planejamentoAtual[nomeDoDia][index].done = li.classList.contains("done");
+                    localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
+                }
+            }
+        });
+
         document.addEventListener("DOMContentLoaded", mostrarPlanejamentoDoDia);
     </script>
 </body>
-
 </html>
