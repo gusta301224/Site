@@ -117,12 +117,14 @@
         /* Estilo para a área de adicionar tarefas */
         .add-task-form {
             display: flex;
+            flex-wrap: wrap;
             margin-top: 2rem;
             gap: 10px;
             justify-content: space-between;
         }
 
         .add-task-form input {
+            flex-grow: 1;
             border: 1px solid #ccc;
             padding: 0.5rem;
             border-radius: 5px;
@@ -237,7 +239,6 @@
             listaTarefas.innerHTML = "";
 
             if (tarefasDoDia) {
-                // Ordena as tarefas por horário
                 tarefasDoDia.sort((a, b) => {
                     const horaA = parseInt(a.horario.split('h')[0]);
                     const horaB = parseInt(b.horario.split('h')[0]);
@@ -277,7 +278,6 @@
 
                     listaTarefas.appendChild(li);
 
-                    // Salva alterações ao sair do campo
                     horarioSpan.addEventListener('blur', () => {
                         salvarEdicao(idDaTarefa, 'horario', horarioSpan.textContent);
                     });
@@ -294,8 +294,8 @@
 
         function salvarEdicao(id, campo, valor) {
             const [nomeDoDia, index] = id.split('-');
-            if (planejamentoAtual[nomeDoDia] && planejamentoAtual[nomeDoDia][index]) {
-                planejamentoAtual[nomeDoDia][index][campo] = valor;
+            if (planejamentoAtual[nomeDoDia] && planejamentoAtual[nomeDoDia][parseInt(index)]) {
+                planejamentoAtual[nomeDoDia][parseInt(index)][campo] = valor;
                 localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
             }
         }
@@ -307,14 +307,12 @@
                 const [nomeDoDia, index] = idDaTarefa.split('-');
 
                 if (event.target.classList.contains("remove-btn")) {
-                    // Remover tarefa
-                    planejamentoAtual[nomeDoDia].splice(index, 1);
+                    planejamentoAtual[nomeDoDia].splice(parseInt(index), 1);
                     localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
                     mostrarPlanejamentoDoDia();
                 } else if (event.target.classList.contains("done-indicator")) {
-                    // Marcar como concluído
-                    const isDone = !planejamentoAtual[nomeDoDia][index].done;
-                    planejamentoAtual[nomeDoDia][index].done = isDone;
+                    const isDone = !planejamentoAtual[nomeDoDia][parseInt(index)].done;
+                    planejamentoAtual[nomeDoDia][parseInt(index)].done = isDone;
                     localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
                     li.classList.toggle("done", isDone);
                     event.target.classList.toggle("done", isDone);
