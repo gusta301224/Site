@@ -226,7 +226,14 @@
             "Sábado"
         ];
         
-        let planejamentoAtual = JSON.parse(localStorage.getItem('planejamentoSemanal')) || planejamentoBase;
+        let planejamentoAtual;
+        try {
+            planejamentoAtual = JSON.parse(localStorage.getItem('planejamentoSemanal')) || planejamentoBase;
+        } catch (e) {
+            console.error("Erro ao carregar do LocalStorage. Usando planejamento base.");
+            planejamentoAtual = planejamentoBase;
+            localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
+        }
 
         function mostrarPlanejamentoDoDia() {
             const dataAtual = new Date();
@@ -239,10 +246,8 @@
             listaTarefas.innerHTML = "";
 
             if (tarefasDoDia) {
-                // A ordenação por horário foi removida para que novas tarefas fiquem no final
                 tarefasDoDia.forEach((item, index) => {
                     const li = document.createElement("li");
-                    // Use um ID mais robusto para evitar conflitos
                     li.dataset.id = `${nomeDoDia}-${index}`;
                     
                     const doneIndicator = document.createElement("span");
@@ -289,8 +294,9 @@
 
         function salvarEdicao(id, campo, valor) {
             const [nomeDoDia, index] = id.split('-');
-            if (planejamentoAtual[nomeDoDia] && planejamentoAtual[nomeDoDia][parseInt(index)]) {
-                planejamentoAtual[nomeDoDia][parseInt(index)][campo] = valor;
+            const indexInt = parseInt(index);
+            if (planejamentoAtual[nomeDoDia] && !isNaN(indexInt) && planejamentoAtual[nomeDoDia][indexInt]) {
+                planejamentoAtual[nomeDoDia][indexInt][campo] = valor;
                 localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
             }
         }
@@ -304,19 +310,22 @@
             const indexInt = parseInt(index);
 
             if (event.target.classList.contains("remove-btn")) {
-                planejamentoAtual[nomeDoDia].splice(indexInt, 1);
-                localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
-                mostrarPlanejamentoDoDia();
+                if (planejamentoAtual[nomeDoDia] && !isNaN(indexInt) && planejamentoAtual[nomeDoDia][indexInt]) {
+                    planejamentoAtual[nomeDoDia].splice(indexInt, 1);
+                    localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
+                    mostrarPlanejamentoDoDia();
+                }
             } else {
-                // Alterna o estado de "feito"
-                const isDone = !planejamentoAtual[nomeDoDia][indexInt].done;
-                planejamentoAtual[nomeDoDia][indexInt].done = isDone;
-                localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
-                
-                li.classList.toggle("done", isDone);
-                const doneIndicator = li.querySelector('.done-indicator');
-                if (doneIndicator) {
-                    doneIndicator.classList.toggle("done", isDone);
+                if (planejamentoAtual[nomeDoDia] && !isNaN(indexInt) && planejamentoAtual[nomeDoDia][indexInt]) {
+                    const isDone = !planejamentoAtual[nomeDoDia][indexInt].done;
+                    planejamentoAtual[nomeDoDia][indexInt].done = isDone;
+                    localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
+                    
+                    li.classList.toggle("done", isDone);
+                    const doneIndicator = li.querySelector('.done-indicator');
+                    if (doneIndicator) {
+                        doneIndicator.classList.toggle("done", isDone);
+                    }
                 }
             }
         });
@@ -326,7 +335,7 @@
             const tarefaNova = document.getElementById("tarefa-nova").value;
             const dataAtual = new Date();
             const numeroDoDia = dataAtual.getDay();
-            const nomeDoDia = diasDa Semana[numeroDoDia];
+            const nomeDoDia = diasDaSemana[numeroDoDia];
 
             if (horarioNovo && tarefaNova) {
                 if (!planejamentoAtual[nomeDoDia]) {
