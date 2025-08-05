@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Planejamento Semanal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #007BFF;
+        }
+
+        #lista-tarefas {
+            list-style: none;
+            padding: 0;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        #lista-tarefas li {
+            background: #e9ecef;
+            margin-bottom: 0.5rem;
+            padding: 1rem;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #lista-tarefas li .horario {
+            font-weight: bold;
+            color: #555;
+        }
+
+        #lista-tarefas li .tarefa {
+            flex-grow: 1;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="dia-da-semana"></h1>
+        <ul id="lista-tarefas"></ul>
+    </div>
+
+    <script>
+        // O planejamento semanal atualizado com o novo cronograma.
+        const planejamentoSemanal = {
+            "Segunda-feira": [
+                { horario: "7h - 7h30", tarefa: "Afazeres simples (varrer, louça, cama)" },
+                { horario: "7h30 - 10h", tarefa: "Estudar" },
+                { horario: "10h - 11h", tarefa: "Treinar" },
+                { horario: "11h - 11h30", tarefa: "Pausa" },
+                { horario: "11h30 - 13h", tarefa: "Estudar" },
+                { horario: "13h - 13h30", tarefa: "Descanço" }
+            ],
+            "Terça-feira": [
+                { horario: "7h - 7h30", tarefa: "Afazeres maiores (varrer, louça, cama)" },
+                { horario: "7h30 - 8h30", tarefa: "Treinar" },
+                { horario: "8h30 - 12h", tarefa: "Estudar" },
+                { horario: "12h - 12h30", tarefa: "Pausa" },
+                { horario: "12h30 - 13h30", tarefa: "Jogar" }
+            ],
+            "Quarta-feira": [
+                { horario: "7h - 7h30", tarefa: "Afazeres maiores (varrer, pano, louça, cama)" },
+                { horario: "7h30 - 10h", tarefa: "Estudar" },
+                { horario: "10h - 10h30", tarefa: "Pausa" },
+                { horario: "10h30 - 11h30", tarefa: "Treinar" },
+                { horario: "11h30 - 13h", tarefa: "Estudar" }
+            ],
+            "Quinta-feira": [
+                { horario: "7h - 7h30", tarefa: "Afazeres simples (varrer, louça, cama)" },
+                { horario: "7h30 - 8h30", tarefa: "Treinar" },
+                { horario: "8h30 - 10h", tarefa: "Estudar" },
+                { horario: "10h - 10h30", tarefa: "Pausa" },
+                { horario: "10h30 - 12h30", tarefa: "Estudar" },
+                { horario: "12h30 - 13h30", tarefa: "Jogar" }
+            ],
+            "Sexta-feira": [
+                { horario: "7h - 8h", tarefa: "Afazeres maiores (varrer, pano, louça, cama)" },
+                { horario: "8h - 9h", tarefa: "Treinar" },
+                { horario: "9h - 9h30", tarefa: "Pausa" },
+                { horario: "9h30 - 12h30", tarefa: "Estudar" },
+                { horario: "12h30 - 13h30", tarefa: "Descanço" }
+            ],
+            "Sábado": [
+                { horario: "7h - 8h30", tarefa: "Afazeres (banheiro, pó, armários, varrer, pano, louça, cama)" },
+                { horario: "8h30 - 9h30", tarefa: "Treinar" },
+                { horario: "9h30 - 10h", tarefa: "Pausa" },
+                { horario: "10h - 12h", tarefa: "Estudar" },
+                { horario: "12h - 13h00", tarefa: "Jogar" }
+            ],
+            "Domingo": [
+                { horario: "O dia todo", tarefa: "Dia de descanso e lazer!" }
+            ]
+        };
+
+        const diasDaSemana = [
+            "Domingo",
+            "Segunda-feira",
+            "Terça-feira",
+            "Quarta-feira",
+            "Quinta-feira",
+            "Sexta-feira",
+            "Sábado"
+        ];
+
+        function mostrarPlanejamentoDoDia() {
+            const dataAtual = new Date();
+            const numeroDoDia = dataAtual.getDay();
+            const nomeDoDia = diasDaSemana[numeroDoDia];
+            const tarefasDoDia = planejamentoSemanal[nomeDoDia];
+
+            document.getElementById("dia-da-semana").innerText = `Planejamento para ${nomeDoDia}`;
+            const listaTarefas = document.getElementById("lista-tarefas");
+            listaTarefas.innerHTML = "";
+
+            if (tarefasDoDia) {
+                tarefasDoDia.forEach(item => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `<span class="horario">${item.horario}</span><span class="tarefa">${item.tarefa}</span>`;
+                    listaTarefas.appendChild(li);
+                });
+            } else {
+                const li = document.createElement("li");
+                li.innerText = "Nenhum planejamento encontrado para este dia.";
+                listaTarefas.appendChild(li);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", mostrarPlanejamentoDoDia);
+    </script>
+</body>
+</html>
