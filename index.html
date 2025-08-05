@@ -239,16 +239,11 @@
             listaTarefas.innerHTML = "";
 
             if (tarefasDoDia) {
-                tarefasDoDia.sort((a, b) => {
-                    const horaA = parseInt(a.horario.split('h')[0]);
-                    const horaB = parseInt(b.horario.split('h')[0]);
-                    return horaA - horaB;
-                });
-
+                // A ordenação por horário foi removida para que novas tarefas fiquem no final
                 tarefasDoDia.forEach((item, index) => {
                     const li = document.createElement("li");
-                    const idDaTarefa = `${nomeDoDia}-${index}`;
-                    li.dataset.id = idDaTarefa;
+                    // Use um ID mais robusto para evitar conflitos
+                    li.dataset.id = `${nomeDoDia}-${index}`;
                     
                     const doneIndicator = document.createElement("span");
                     doneIndicator.className = "done-indicator";
@@ -279,10 +274,10 @@
                     listaTarefas.appendChild(li);
 
                     horarioSpan.addEventListener('blur', () => {
-                        salvarEdicao(idDaTarefa, 'horario', horarioSpan.textContent);
+                        salvarEdicao(li.dataset.id, 'horario', horarioSpan.textContent);
                     });
                     tarefaSpan.addEventListener('blur', () => {
-                        salvarEdicao(idDaTarefa, 'tarefa', tarefaSpan.textContent);
+                        salvarEdicao(li.dataset.id, 'tarefa', tarefaSpan.textContent);
                     });
                 });
             } else {
@@ -302,20 +297,26 @@
 
         document.getElementById("lista-tarefas").addEventListener("click", function(event) {
             const li = event.target.closest("li");
-            if (li) {
-                const idDaTarefa = li.dataset.id;
-                const [nomeDoDia, index] = idDaTarefa.split('-');
+            if (!li) return;
+            
+            const idDaTarefa = li.dataset.id;
+            const [nomeDoDia, index] = idDaTarefa.split('-');
+            const indexInt = parseInt(index);
 
-                if (event.target.classList.contains("remove-btn")) {
-                    planejamentoAtual[nomeDoDia].splice(parseInt(index), 1);
-                    localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
-                    mostrarPlanejamentoDoDia();
-                } else if (event.target.classList.contains("done-indicator")) {
-                    const isDone = !planejamentoAtual[nomeDoDia][parseInt(index)].done;
-                    planejamentoAtual[nomeDoDia][parseInt(index)].done = isDone;
-                    localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
-                    li.classList.toggle("done", isDone);
-                    event.target.classList.toggle("done", isDone);
+            if (event.target.classList.contains("remove-btn")) {
+                planejamentoAtual[nomeDoDia].splice(indexInt, 1);
+                localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
+                mostrarPlanejamentoDoDia();
+            } else {
+                // Alterna o estado de "feito"
+                const isDone = !planejamentoAtual[nomeDoDia][indexInt].done;
+                planejamentoAtual[nomeDoDia][indexInt].done = isDone;
+                localStorage.setItem('planejamentoSemanal', JSON.stringify(planejamentoAtual));
+                
+                li.classList.toggle("done", isDone);
+                const doneIndicator = li.querySelector('.done-indicator');
+                if (doneIndicator) {
+                    doneIndicator.classList.toggle("done", isDone);
                 }
             }
         });
@@ -325,7 +326,7 @@
             const tarefaNova = document.getElementById("tarefa-nova").value;
             const dataAtual = new Date();
             const numeroDoDia = dataAtual.getDay();
-            const nomeDoDia = diasDaSemana[numeroDoDia];
+            const nomeDoDia = diasDa Semana[numeroDoDia];
 
             if (horarioNovo && tarefaNova) {
                 if (!planejamentoAtual[nomeDoDia]) {
