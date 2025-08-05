@@ -46,7 +46,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer; /* Adicionado para indicar que o item é clicável */
+            cursor: pointer;
             transition: background-color 0.2s;
         }
 
@@ -76,7 +76,7 @@
         #lista-tarefas li .tarefa {
             flex-grow: 1;
             margin-right: 1rem;
-            outline: none; /* Remove o contorno azul ao editar */
+            outline: none;
         }
     </style>
 </head>
@@ -88,7 +88,6 @@
     </div>
 
     <script>
-        // O planejamento semanal atualizado com o novo cronograma.
         const planejamentoBase = {
             "Segunda-feira": [
                 { horario: "7h - 7h30", tarefa: "Afazeres simples (varrer, louça, cama)" },
